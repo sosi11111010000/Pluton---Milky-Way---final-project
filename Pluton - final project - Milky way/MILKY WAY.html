@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Milky Way</title>
+	</head>
+
+	<body>
+				<style>
+body{
+	background-image: url('backgrounHtml.jpg');
+
+}
+canvas{
+		padding: 0;
+    margin: auto;
+    display: block;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+		background-image: url('background.jpg');
+}
+		</style>
+		<canvas id="canvas" width="1280" height="720"></canvas>
+		<script>
+		
+	let canvas = document.getElementById("canvas");
+	let context = canvas.getContext("2d");
+	
+	let gameAudio = new Audio('NyanCat.mp3');
+	let gameOver = new Audio('gameover.mp3');
+	let strike = new Audio('strike.mp3');
+	let thread0 = new Audio('thread.ogg');
+		  thread0.volume=1;
+	let choocolate1 = new Audio('choocolate.ogg');
+			choocolate1.volume=1;
+	let milkbottle2 = new Audio('milkbottle.ogg');
+	let tardis3 = new Audio('tardis.ogg');
+	let winsound = new Audio('winsound.mp3');
+
+	let image0 = new Image();
+		image0.src = 'purplethread.png';
+	let image1 = new Image();
+		image1.src = 'cookie.png';
+	let image2 = new Image();
+		image2.src = 'milk.png';
+	let image3 = new Image();
+		image3.src = 'tardis.png';
+	let image89 = new Image();
+		image89.src = 'help.jpg';
+	let ball1= new Image();
+		ball1.src='ball1.png';
+	let racket1= new Image();
+		racket1.src='Nyan1.png';
+	let volumeOff= new Image();
+		volumeOff.src='muteon.png';
+	let volumeOn= new Image();
+		volumeOn.src='muteoff.png';
+	let strike0= new Image();
+		strike0.src='3sirtik.png';
+	let strike1= new Image();
+		strike1.src='2hearts.png';
+	let strike2= new Image();
+		strike2.src='1sirtik.png';
+	let menuback= new Image();
+		menuback.src='menuback2.jpg';
+	let newgamebtn= new Image();
+		newgamebtn.src='newgamebutton.png';
+	let backbtn= new Image();
+		backbtn.src='backbutton.png';
+	let howtoplaybtn= new Image();
+		howtoplaybtn.src='helpbutton.png';
+	let strikeimg1= new Image();
+		strikeimg1.src='strike1.png';
+	let strikeimg2= new Image();
+		strikeimg2.src='strike2.png';
+	let continueimg= new Image();
+		continueimg.src='continue.png';
+	let nextlvlimg= new Image();
+		nextlvlimg.src='nextlevelbutton.png';
+	let gameovertxt= new Image();
+		gameovertxt.src='gameover.png';
+	let youwontxt= new Image();
+		youwontxt.src='youwon.png';
+	let pausedtxt= new Image();
+		pausedtxt.src='paused.png';	
+	let lvl1= new Image();
+		lvl1.src='level1.png';	
+	let lvl2= new Image();
+		lvl2.src='level2.png';	
+	let lvl3= new Image();
+		lvl3.src='level3.png';	
+	let lvl4= new Image();
+		lvl4.src='level4.png';	
+	let menubackground1= new Image();
+		menubackground1.src='milkywaylogo1.jpeg';		
+		
+	let yTop=48;
+	let mX;
+	let mY;
+	let level = 1;
+
+	context.canvas.addEventListener('mousemove', function(event){
+		let mouseX= event.clientX - context.canvas.offsetLeft;
+		if(mouseX<=canvas.width-racket.width/2 && mouseX>=racket.width/2)
+			racket.x=mouseX-racket.width/2;
+	});
+	
+	window.addEventListener('keydown', function(event){
+		const k = event.keyCode;
+		if(k=== 80 || k=== 112)
+			if(gameMode === 'play')
+				gameMode = 'pause';
+			else if(gameMode === 'pause')
+				gameMode = 'play';
+									
+		if(k=== 77 || k=== 109)		
+			if(MusicButton.clicked === false){
+				gameAudio.pause();
+				MusicButton.clicked = true;
+			}
+			else {
+				gameAudio.play();
+				MusicButton.clicked = false;
+			}
+	});
+	
+	let gameMode = 'new';
+	let strikes = 0;
+	const racket = {
+		x: 0,
+		y: canvas.height-45,
+		width: 265,
+		height: 40
+	};
+	const NUM_POINTS = 5;
+	const ball = {
+			x: racket.width/2,
+				y: racket.y - 15,
+				rad: 10,
+				deltaX: 0.1,
+				deltaY: -0.1
+	};
+	
+	const points = [];
+	for(let i = 0; i < NUM_POINTS*2; i++) {
+			for(let j = 0;j < NUM_POINTS; j++)
+				points.push({
+				x: (canvas.width/(NUM_POINTS*2))*i,
+				y: (canvas.height/(3*NUM_POINTS))*j+yTop,
+				width: canvas.width/(NUM_POINTS*2) - 5,
+				height: canvas.height/(3*NUM_POINTS) - 5,
+				bricktype: 'brick1'
+			});
+	}
+	
+	const initBlocks = function(){
+		points.forEach(function(point) {
+			const i = point.x / (canvas.width/(NUM_POINTS*2));
+			const j = (point.y - yTop) / (canvas.height/(NUM_POINTS*3));
+			if(level === 1)
+				point.bricktype='brick1';
+			else if( level === 2){
+						if((i+j)%4 === 0)
+							point.bricktype = 'brick2';
+						else
+							point.bricktype = 'brick1';
+			}
+			else if(level === 3){
+						if((i-j)%4 === 0 || (i+j)%4 === 0)
+							point.bricktype = 'brick2';
+						else
+							point.bricktype = 'brick1';
+						if((i-j)%4 === 0 && (i+j)%4 === 0)
+							point.bricktype = 'brick3';
+			}
+			else if(level === 4){
+						if((i-j)%2 === 0)
+							point.bricktype = 'brick3';
+						if((i-j)%3 === 0)
+							point.bricktype = 'brick2';
+						if((i-j)%4 === 0)
+							point.bricktype = 'brick4';
+						if((i-j)%2 !== 0 && (i-j)%3 !== 0 && (i-j)%4 !== 0)
+							point.bricktype = 'brick1';
+							}
+			else if(level === 5){
+						point.bricktype = 'brick2';
+						}
+			});
+	};
+	const MusicButton = {
+				x: 170,
+				y: yTop-37,
+				width: 30,
+				height: 30,
+				clicked: false
+	};
+	const newgame = function(){
+		context.clearRect(0,0,canvas.width, canvas.height);
+		if(gameMode ==='new')
+			context.drawImage(menubackground1,0, 0, canvas.width, canvas.height);
+		else
+			context.drawImage(menuback,0, 0, canvas.width, canvas.height);
+		const howToPlayButton = {
+			x: canvas.width/2 - 100,
+			y: canvas.height/3+200,
+			width: 200,
+			height: 50
+		};
+		
+		const backToMenu = {
+			x: canvas.width - 100,
+			y: canvas.height-60,
+			width: 80,
+			height: 40
+		};
+			
+		if(gameMode === 'new' || gameMode === 'over' || (gameMode === 'won' && level===5)){
+			context.drawImage(howtoplaybtn,howToPlayButton.x, howToPlayButton.y, howToPlayButton.width, howToPlayButton.height);
+		}
+			
+		const newGameButton = {
+			x: canvas.width/2 - 100,
+			y: canvas.height/3 + 100,
+			width: 200,
+			height: 50
+		};
+		
+		if(gameMode === 'strike'|| gameMode === 'pause'){
+			context.drawImage(continueimg,newGameButton.x, newGameButton.y, newGameButton.width, newGameButton.height);
+		}
+		else if(gameMode === 'won' && level >=1 && level < 5){
+					context.drawImage(nextlvlimg,newGameButton.x, newGameButton.y, newGameButton.width, newGameButton.height);
+		}
+		else if(gameMode === 'over' || (gameMode === 'won' && level===5) || gameMode ==='new')
+					context.drawImage(newgamebtn,newGameButton.x, newGameButton.y, newGameButton.width, newGameButton.height);
+		
+		if(gameMode=== 'over'){
+			context.drawImage(gameovertxt, canvas.width/2-350, canvas.height/2-200, 700, 100);
+			
+			if(MusicButton.clicked === false){
+			gameAudio.pause();
+			gameOver.play();
+			}
+		}
+		else if(gameMode === 'won'){
+					if(level<5){
+						if(level===1){
+								context.drawImage(lvl1, canvas.width/2-350, canvas.height/2-200, 700, 100);
+						}
+						else if(level===2){
+									context.drawImage(lvl2, canvas.width/2-350, canvas.height/2-200, 700, 100);
+						}
+						else if(level===3){
+									context.drawImage(lvl3, canvas.width/2-350, canvas.height/2-200, 700, 100);
+						}
+						else if(level===4){
+									context.drawImage(lvl4, canvas.width/2-350, canvas.height/2-200, 700, 100);
+						}
+					}
+					else {
+						
+						if(MusicButton.clicked === false){
+							gameAudio.pause();
+							winsound.play();
+						}
+						context.drawImage(youwontxt, canvas.width/2-350, canvas.height/2-200, 700, 100);
+					}
+				}
+		else if(gameMode === 'strike'){
+					if(MusicButton.clicked === false){
+						gameAudio.pause();
+						strike.play();
+					}
+					if (strikes===1){
+						context.drawImage(strikeimg1, canvas.width/2-250, canvas.height/2-200, 500, 100);
+					}
+					if (strikes===2){
+						context.drawImage(strikeimg2,canvas.width/2-250, canvas.height/2-200, 500, 100);
+					}
+		}
+		else if(gameMode === 'pause'){
+					context.drawImage(pausedtxt,canvas.width/2-350, canvas.height/2-200, 700, 100);
+		}
+		else if(gameMode === 'help'){
+					context.drawImage(image89,0, 0, canvas.width, canvas.height);
+					context.drawImage(backbtn,backToMenu.x, backToMenu.y, backToMenu.width, backToMenu.height);
+		}
+
+		context.canvas.addEventListener('click', function(event){
+			if(MusicButton.clicked===false){
+				gameAudio.play();
+				gameAudio.volume=0.1;
+				gameAudio.addEventListener('ended', function(){
+						gameAudio.play();
+				}, false);
+			}
+			mX= event.clientX - context.canvas.offsetLeft;
+			mY= event.clientY - context.canvas.offsetTop;
+			if((gameMode === 'new' || gameMode === 'over' || (gameMode === 'won' && level ===5)) && howToPlayButton.x <= mX && mX <=howToPlayButton.x + howToPlayButton.width && howToPlayButton.y <= mY && mY <=howToPlayButton.y + howToPlayButton.height){
+				gameMode = 'help';
+			}
+			if(gameMode === 'help' && backToMenu.x <= mX && mX <=backToMenu.x + backToMenu.width && backToMenu.y <= mY && mY <=backToMenu.y + backToMenu.height){
+				gameMode = 'new';
+			}
+			if(gameMode === 'play')
+				if(MusicButton.x <= mX && mX <=MusicButton.x + MusicButton.width && MusicButton.y <= mY && mY <=MusicButton.y + MusicButton.height){
+					if(MusicButton.clicked === false)
+					{
+						gameAudio.pause();
+					}
+					else {
+						gameAudio.play();
+					}
+					MusicButton.clicked= !MusicButton.clicked;
+				}
+				if(newGameButton.x <= mX && mX <=newGameButton.x + newGameButton.width && newGameButton.y <= mY && mY <=newGameButton.y + newGameButton.height){
+					if(gameMode !== 'play' && gameMode !== 'help'){
+						if(gameMode === 'won' || gameMode === 'new' || gameMode === 'over'){
+							if(gameMode ==='won')
+								if(level<5)
+									level++;
+								else
+									level = 1;
+							initBlocks();
+						}
+						if(gameMode !== 'pause'){
+							ball.deltaY = -0.1;
+							ball.x = canvas.width/2;
+							ball.y = racket.y - ball.rad- 1;
+						}
+						if(gameMode === 'strike'){
+							strike.pause();
+							strike.currentTime = 0;
+						}
+						if(gameMode === 'over'){
+							gameOver.pause();
+							gameOver.currentTime = 0;
+						}
+						if(gameMode === 'won' ){
+							winsound.pause();
+							winsound.currentTime = 0;
+						}
+						gameMode='play';
+					}
+				}
+		});
+	};
+	
+	const audioBlock = function(obj){
+		if(MusicButton.clicked === false){
+			if(obj.bricktype === 'brick1')
+				thread0.play();
+			if(obj.bricktype === 'brick2')
+			  choocolate1.play();
+			if(obj.bricktype === 'brick3')
+				milkbottle2.play();
+			if(obj.bricktype === 'brick4')
+				tardis3.play();
+		}
+	};
+	
+	const blockType = function(obj){
+		if(obj.bricktype === 'brick1')
+			return 'none';
+		if(obj.bricktype === 'brick2')
+			return 'brick1';
+		if(obj.bricktype === 'brick3')
+			return 'brick2';
+		if(obj.bricktype === 'brick4')
+			return 'brick3';
+	};
+	
+	const draw = function() {
+		let win= true;
+		context.clearRect(0,0,canvas.width, canvas.height);
+		points.forEach(function(point) {
+			if(point.bricktype !== 'none'){
+				win= false;
+				if(point.bricktype === 'brick1'){
+					context.drawImage(image0, point.x, point.y, point.width, point.height);
+				}
+				else	if (point.bricktype==='brick2'){
+					context.drawImage(image1, point.x, point.y, point.width, point.height);
+				}
+				else if(point.bricktype==='brick3'){
+					context.drawImage(image2, point.x, point.y, point.width, point.height);
+				}
+				else if(point.bricktype==='brick4'){
+					context.drawImage(image3, point.x, point.y, point.width, point.height);
+				}
+			}
+			
+			context.drawImage(racket1,racket.x, racket.y, racket.width, racket.height);
+			
+			context.drawImage(ball1, ball.x, ball.y);
+			
+			if(ball.x+ball.rad >= canvas.width || ball.x-ball.rad <= 0)
+				ball.deltaX *= -1;
+			if(ball.y - ball.rad <= yTop)
+				ball.deltaY *= -1;
+			if(ball.y+ ball.rad >= canvas.height){
+				strikes++;
+				gameMode='strike';
+				if(strikes >= 3){
+					gameMode= 'over';
+					strikes = 0;
+					level = 1;
+				}
+				ball.y= racket.y - 15;
+				ball.deltaY=0;
+			}
+			if((ball.y - ball.rad  <= point.y+ point.height) && (ball.y + ball.rad  > point.y+ point.height) && (ball.x >= point.x) && (ball.x <= point.x+point.width+5) && (point.bricktype !== 'none')){
+				audioBlock(point);
+				ball.deltaY *= -1;
+				point.bricktype= blockType(point);
+			}
+			if((ball.y - ball.rad  < point.y) && (ball.y + ball.rad  >= point.y) && (ball.x >= point.x) && (ball.x <= point.x+point.width+5) && (point.bricktype !== 'none')){
+				audioBlock(point);
+				ball.deltaY *= -1;
+				point.bricktype=blockType(point);
+			}
+			if((ball.x - ball.rad  < point.x) && (ball.x + ball.rad  >= point.x) && (ball.y >= point.y) && (ball.y <= point.y+point.height+5) && (point.bricktype !== 'none')){
+				audioBlock(point);
+				ball.deltaX *= -1;
+				point.bricktype=blockType(point);
+			}
+			if((ball.x - ball.rad  <= point.x + point.width) && (ball.x + ball.rad  > point.x + point.width) && (ball.y >= point.y) && (ball.y <= point.y+point.height+5) && (point.bricktype !== 'none')){
+				audioBlock(point);
+				ball.deltaX *= -1;
+				point.bricktype=blockType(point);
+			}
+			if((ball.y + ball.rad >= racket.y) && (ball.y + ball.rad <= racket.y+1) && (ball.x >= racket.x) && (ball.x <= racket.x+racket.width)){
+				ball.deltaY *= -1;
+			}
+			if((ball.x - ball.rad  <= racket.x + racket.width) && (ball.x + ball.rad  > racket.x + racket.width) && (ball.y >= racket.y) && (ball.y <= racket.y+racket.height)){
+				ball.deltaX *= -1;
+			}
+			if((ball.x - ball.rad  < racket.x) && (ball.x + ball.rad  >= racket.x) && (ball.y >= racket.y) && (ball.y <= racket.y+racket.height))
+				ball.deltaX *= -1;
+			ball.x += ball.deltaX;
+			ball.y += ball.deltaY;
+		});
+		if(win){
+			gameMode='won';
+			if(level === 5)	
+				strikes=0;
+		}
+
+		context.fillStyle='gray';
+		context.fillRect(0, 0, canvas.width, yTop);
+		if(MusicButton.clicked === false)
+			context.drawImage(volumeOff, MusicButton.x, MusicButton.y, MusicButton.width, MusicButton.height);
+		else
+			context.drawImage(volumeOn, MusicButton.x, MusicButton.y, MusicButton.width, MusicButton.height);
+		if (strikes===0){
+			context.drawImage(strike0, 20, yTop-35, 120, 30);
+		}
+		else if (strikes===1){
+			context.drawImage(strike1, 20, yTop-35, 120, 30);
+		}
+		else if (strikes===2){
+			context.drawImage(strike2, 20, yTop-35, 120, 30);
+		}
+	};
+	let game = function() {
+		if(gameMode === 'new' || gameMode === 'won' || gameMode === 'over' || gameMode=== 'strike'|| gameMode=== 'pause' || gameMode=== 'help'){
+			newgame();
+		}
+		else  if(gameMode==='play'){
+			draw();
+		}
+		setTimeout(game, 10);
+	};
+	
+	game();
+
+	</script>
+	</body>
+</html>
