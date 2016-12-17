@@ -115,16 +115,38 @@ canvas{
 			else if(gameMode === 'pause')
 				gameMode = 'play';
 									
-		if(k=== 77 || k=== 109)		
+
+		if(k=== 77 || k=== 109)
 			if(MusicButton.clicked === false){
-				gameAudio.pause();
+			 gameAudio.pause();
 				MusicButton.clicked = true;
+				if(gameMode === 'strike'){
+					strike.pause();
+				}
+				if(gameMode === 'over'){
+					gameOver.pause();
+				}
+				if(gameMode === 'won' && level === 5){
+					winsound.pause();
+				}
+				
 			}
-			else {
+			else if (MusicButton.clicked === true){
 				gameAudio.play();
 				MusicButton.clicked = false;
+				if(gameMode === 'strike'){
+					strike.play();
+				}
+				if(gameMode === 'over'){
+					gameOver.play();
+				}
+				if(gameMode === 'won' && level === 5){
+					winsound.play();
+				}
 			}
 	});
+			
+	
 	
 	let gameMode = 'new';
 	let strikes = 0;
